@@ -9,20 +9,20 @@
 function [XX_control, YY_control, VV_control, WW_control, AA_control, VVx_control, VVy_control] = Load_TimeSeries_Control(Parameters,Dat_Control)
 
 x_max = Parameters.x_max;
-y_tank = Parameters.y_tank;
+% y_tank = Parameters.y_tank;
 y_max = Parameters.y_max;
-fps = Parameters.fps;
+% fps = Parameters.fps;
 dt = Parameters.dt;
 Xmin = Parameters.Xmin;
 Xmax = Parameters.Xmax;
 Ymin = Parameters.Ymin;
 Ymax= Parameters.Ymax;
 T_total = Parameters.T_total;
-n_trials = Parameters.n_trials;
+n_trials = min(Parameters.n_trials, numel(Dat_Control));
 scale_x = Parameters.scale_x;
 scale_y = Parameters.scale_y;
-x_rect = Parameters.x_rect;
-y_rect = Parameters.y_rect;
+% x_rect = Parameters.x_rect;
+% y_rect = Parameters.y_rect;
 
 px2cm_x = @(px) (2*(px - Xmin)./(Xmax-Xmin) - 1) * scale_x;
 px2cm_y = @(py) (2*(py - Ymin)./(Ymax-Ymin) - 1) * scale_y;
@@ -35,6 +35,13 @@ WW_control = nan(T_total,n_trials);
 AA_control = nan(T_total,n_trials);
 VVx_control = nan(T_total,n_trials);
 VVy_control = nan(T_total,n_trials);
+
+% FILTER PARAMETERS
+order = 4; % Filter order
+fc = 10;   % Desired cutoff frequency in Hz
+Fs = 1/dt;
+wc = fc / (Fs/2); % Normalize to Nyquist
+[b, a] = butter(order, wc, 'low');
 
 for i = 1:n_trials
     if i>length(Dat_Control), continue; end
@@ -49,12 +56,8 @@ for i = 1:n_trials
     n = min([T_total,length(X_px), length(Y_px)]);
     X_cm = px2cm_x(X_px(1:n));
     Y_cm = px2cm_y(Y_px(1:n));
-
-    order = 4; % Filter order
-    fc = 10;   % Desired cutoff frequency in Hz
-    Fs = 1/dt;
-    wc = fc / (Fs/2); % Normalize to Nyquist
-    [Xfilter, Yfilter, V, W, A, heading, Vx, Vy] = Kinematic_Variables(X_cm,Y_cm,dt,x_max/2,y_max/2,order,wc);
+    
+    [Xfilter, Yfilter, V, W, A, heading, Vx, Vy] = Kinematic_Variables(X_cm,Y_cm,dt,x_max/2,y_max/2, b, a);
       
     % save time series
     XX_control(1:length(Yfilter),i) =  Xfilter;

@@ -28,7 +28,7 @@ for i = 1:num_bins
     bin_data = M(idx_start:idx_end, :); % Bin range for all individuals
     
     % Compute mean and variance across individuals for this bin
-    Mean_matrix(i,:) = nanmean(bin_data, 1);
+    Mean_matrix(i,:) = mean(bin_data, 1, 'omitnan');
 end
 
 end

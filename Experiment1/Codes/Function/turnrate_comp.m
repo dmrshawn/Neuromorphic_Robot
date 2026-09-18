@@ -7,15 +7,15 @@
 
 
 function [WG] = turnrate_comp(costheta, sintheta, dt)
+    crossTerm = ...
+        costheta(1:end-1).*sintheta(2:end) - ...
+        sintheta(1:end-1).*costheta(2:end);
 
-posonCircle = [costheta, sintheta];
-WG = zeros(length(costheta)-1,1);
-for k = 1 : length(costheta)-1
-    v1 = posonCircle(k,:);
-    v2 = posonCircle(k+1,:);
-    deltaPhi = atan2(det([v1',v2']), dot(v1,v2));
-    deltaPhi = wrapToPi(deltaPhi);
-    WG(k) = (deltaPhi / dt);
-end
+    dotTerm = ...
+        costheta(1:end-1).*costheta(2:end) + ...
+        sintheta(1:end-1).*sintheta(2:end);
 
+    deltaPhi = atan2(crossTerm, dotTerm);
+
+    WG = deltaPhi ./ dt;
 end

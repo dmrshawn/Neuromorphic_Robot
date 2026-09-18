@@ -6,7 +6,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Xfilter,Yfilter,V,W,A,heading,Vx,Vy] = Kinematic_Variables(Xi,Yi,dt,Xmax,Ymax,order,wc)
+function [Xfilter,Yfilter,V,W,A,heading,Vx,Vy] = Kinematic_Variables(Xi,Yi,dt,Xmax,Ymax, a, b)
 
 % Outlier removal
 speed_thresh = 100;  % cm/s
@@ -17,9 +17,9 @@ vy_raw = gradient(Yi, dt);
 V_raw = sqrt(vx_raw.^2 + vy_raw.^2);
 A_raw = gradient(V_raw, dt); % Acceleration magnitude (scalar)
 
-outlier_speed = V_raw > speed_thresh;
-outlier_accel = abs(A_raw) > accel_thresh;
-outlier_idx = outlier_speed | outlier_accel;
+% outlier_speed = V_raw > speed_thresh;
+% outlier_accel = abs(A_raw) > accel_thresh;
+outlier_idx = (V_raw > speed_thresh) | (abs(A_raw) > accel_thresh);
 Xi(outlier_idx) = NaN;
 Yi(outlier_idx) = NaN;
 
@@ -28,13 +28,13 @@ Xi(abs(Xi) > Xmax) = NaN;
 Yi(abs(Yi) > Ymax) = NaN;
 
 % Count removals
-n_total = length(Xi);
-n_combined = sum(isnan(Xi));
+% n_total = length(Xi);
+% n_combined = sum(isnan(Xi));
 
 X = fillmissing(Xi, 'linear');
 Y = fillmissing(Yi, 'linear');
 
-[b, a] = butter(order, wc, 'low');
+% [b, a] = butter(order, wc, 'low');
 Xfilter = filtfilt(b, a, X);
 Yfilter = filtfilt(b, a, Y);
 

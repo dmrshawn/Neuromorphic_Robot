@@ -17,6 +17,7 @@ useCachedResults = false;
 
 analysisFolder = fileparts(mfilename('fullpath'));
 addpath(analysisFolder);
+addpath(fullfile(analysisFolder, 'Function'));
 
 outputFolder = fullfile(analysisFolder, 'Output_E1');
 figuresFolder = fullfile(outputFolder, 'Figures');
@@ -25,15 +26,12 @@ if ~exist(figuresFolder, 'dir')
     mkdir(figuresFolder);
 end
 
-resultsFile = fullfile(outputFolder, ...
-    'Result_E1.mat');
+resultsFile = fullfile(outputFolder, 'Result_E1.mat');
 
 cacheFile = resultsFile;
-
 if useCachedResults
 
-    assert(isfile(cacheFile), ...
-        'Cannot find cached result file:\n%s', cacheFile);
+    assert(isfile(cacheFile), 'Cannot find cached result file:\n%s', cacheFile);
 
     load(cacheFile);
 
@@ -42,8 +40,7 @@ if useCachedResults
     analysisFolder = fileparts(mfilename('fullpath'));
     outputFolder   = fullfile(analysisFolder, 'Output_E1');
     figuresFolder  = fullfile(outputFolder, 'Figures');
-    resultsFile    = fullfile(outputFolder, ...
-        'Result_E1.mat');
+    resultsFile    = fullfile(outputFolder, 'Result_E1.mat');
     cacheFile      = resultsFile;
     
     fprintf('Loaded cached results from:\n%s\n', cacheFile);
@@ -51,12 +48,9 @@ if useCachedResults
 else
 
     %% 1) Load Data
-    load( ...
-        fullfile(analysisFolder, 'Data_E1.mat'), ...
-        'Dat_contr', 'Dat_A2C', 'Dat_C2A');
-
+    load(fullfile(analysisFolder, 'Data_E1.mat'), 'Dat_contr', 'Dat_A2C', 'Dat_C2A');
     Dat_Control = Dat_contr;
-
+    
     %% 2) Load Parameters
     Parameters = load_constants(Dat_Control);
 
@@ -70,26 +64,18 @@ else
     Ymin = Parameters.Ymin;
     Ymax = Parameters.Ymax;
     n_trials = Parameters.n_trials;
-
+    
     %% 3) Load Time series
-    [XX_control, YY_control, VV_control, WW_control, ...
-        AA_control, VVx_control, VVy_control] = ...
-        Load_TimeSeries_Control(Parameters, Dat_Control);
+    [XX_control, YY_control, VV_control, WW_control, AA_control, VVx_control, VVy_control] = Load_TimeSeries_Control(Parameters, Dat_Control);
 
-    [TimeSeries_Fish_A2C, TimeSeries_Robot_A2C] = ...
-        Load_TimeSeries_A_and_C(Parameters, Dat_A2C);
+    [TimeSeries_Fish_A2C, TimeSeries_Robot_A2C] = Load_TimeSeries_A_and_C(Parameters, Dat_A2C);
 
-    [TimeSeries_Fish_C2A, TimeSeries_Robot_C2A] = ...
-        Load_TimeSeries_A_and_C(Parameters, Dat_C2A);
-
+    [TimeSeries_Fish_C2A, TimeSeries_Robot_C2A] = Load_TimeSeries_A_and_C(Parameters, Dat_C2A);
+    
 end
 
 set(groot, 'DefaultFigureWindowStyle', 'normal');
-set(groot, ...
-    'defaultAxesFontName', 'Helvetica', ...
-    'defaultAxesFontSize', 12, ...
-    'defaultTextFontName', 'Helvetica', ...
-    'defaultLegendFontName', 'Helvetica');
+set(groot, 'defaultAxesFontName', 'Helvetica', 'defaultAxesFontSize', 12, 'defaultTextFontName', 'Helvetica', 'defaultLegendFontName', 'Helvetica');
 
 pale_gray  = [0.80,0.80,0.80];
 pale_black = [0.15,0.15,0.15];
@@ -115,14 +101,11 @@ axis([0.5,2.5,0,30])
 
 % Absolute Acceleration
 if ~useCachedResults
-    M_AA_control = Compute_time_Average( ...
-        abs(AA_control), Num_Time_Bins);
+    M_AA_control = Compute_time_Average(abs(AA_control), Num_Time_Bins);
 
-    M_AA_f_A2C = Compute_time_Average( ...
-        abs(TimeSeries_Fish_A2C.AA_f), Num_Time_Bins);
+    M_AA_f_A2C = Compute_time_Average(abs(TimeSeries_Fish_A2C.AA_f), Num_Time_Bins);
 
-    M_AA_f_C2A = Compute_time_Average( ...
-        abs(TimeSeries_Fish_C2A.AA_f), Num_Time_Bins);
+    M_AA_f_C2A = Compute_time_Average(abs(TimeSeries_Fish_C2A.AA_f), Num_Time_Bins);
 end
 
 plot_grouped_bar(M_AA_control, M_AA_f_A2C, M_AA_f_C2A,Font_Size);
@@ -170,15 +153,11 @@ sem_pos_A2C = sd_pos_A2C ./ sqrt(n_trials);
 sem_pos_C2A = sd_pos_C2A ./ sqrt(n_trials);
 
 figure; set(gcf, 'Position', [615 595 466*2 190*2]); hold on;
-fill([time fliplr(time)], [(mu_pos_A2C+sd_pos_A2C)' fliplr((mu_pos_A2C-sd_pos_A2C)')], ...
-     pale_red, 'FaceAlpha',0.20, 'EdgeColor','none');
-fill([time fliplr(time)], [(mu_pos_C2A+sd_pos_C2A)' fliplr((mu_pos_C2A-sd_pos_C2A)')], ...
-     pale_blue, 'FaceAlpha',0.20, 'EdgeColor','none');
+fill([time fliplr(time)], [(mu_pos_A2C+sd_pos_A2C)' fliplr((mu_pos_A2C-sd_pos_A2C)')], pale_red, 'FaceAlpha',0.20, 'EdgeColor','none');
+fill([time fliplr(time)], [(mu_pos_C2A+sd_pos_C2A)' fliplr((mu_pos_C2A-sd_pos_C2A)')], pale_blue, 'FaceAlpha',0.20, 'EdgeColor','none');
 
-errorbar(time, mu_pos_A2C, sem_pos_A2C, 'o-', 'Color', pale_red, ...
-    'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
-errorbar(time, mu_pos_C2A, sem_pos_C2A, 'o-', 'Color', pale_blue, ...
-    'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
+errorbar(time, mu_pos_A2C, sem_pos_A2C, 'o-', 'Color', pale_red, 'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
+errorbar(time, mu_pos_C2A, sem_pos_C2A, 'o-', 'Color', pale_blue, 'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
 
 set(gca, 'FontSize',18, 'TickLabelInterpreter','latex','XColor','k','YColor','k');
 set(gcf, 'Color','w');
@@ -198,15 +177,11 @@ sem_vel_A2C = sd_vel_A2C ./ sqrt(n_trials);
 sem_vel_C2A = sd_vel_C2A ./ sqrt(n_trials);
 
 figure; set(gcf, 'Position', [615 595 466*2 190*2]); hold on;
-fill([time fliplr(time)], [(mu_vel_A2C+sd_vel_A2C)' fliplr((mu_vel_A2C-sd_vel_A2C)')], ...
-     pale_red, 'FaceAlpha',0.20, 'EdgeColor','none');
-fill([time fliplr(time)], [(mu_vel_C2A+sd_vel_C2A)' fliplr((mu_vel_C2A-sd_vel_C2A)')], ...
-     pale_blue, 'FaceAlpha',0.20, 'EdgeColor','none');
+fill([time fliplr(time)], [(mu_vel_A2C+sd_vel_A2C)' fliplr((mu_vel_A2C-sd_vel_A2C)')], pale_red, 'FaceAlpha',0.20, 'EdgeColor','none');
+fill([time fliplr(time)], [(mu_vel_C2A+sd_vel_C2A)' fliplr((mu_vel_C2A-sd_vel_C2A)')], pale_blue, 'FaceAlpha',0.20, 'EdgeColor','none');
 
-errorbar(time, mu_vel_A2C, sem_vel_A2C, 'o-', 'Color', pale_red, ...
-    'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
-errorbar(time, mu_vel_C2A, sem_vel_C2A, 'o-', 'Color', pale_blue, ...
-    'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
+errorbar(time, mu_vel_A2C, sem_vel_A2C, 'o-', 'Color', pale_red, 'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
+errorbar(time, mu_vel_C2A, sem_vel_C2A, 'o-', 'Color', pale_blue, 'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
 
 set(gca, 'FontSize',18, 'TickLabelInterpreter','latex','XColor','k','YColor','k');
 set(gcf, 'Color','w');
@@ -226,15 +201,11 @@ sem_acc_A2C = sd_acc_A2C ./ sqrt(n_trials);
 sem_acc_C2A = sd_acc_C2A ./ sqrt(n_trials);
 
 figure; set(gcf, 'Position', [615 595 466*2 190*2]); hold on;
-fill([time fliplr(time)], [(mu_acc_A2C+sd_acc_A2C)' fliplr((mu_acc_A2C-sd_acc_A2C)')], ...
-     pale_red, 'FaceAlpha',0.20, 'EdgeColor','none');
-fill([time fliplr(time)], [(mu_acc_C2A+sd_acc_C2A)' fliplr((mu_acc_C2A-sd_acc_C2A)')], ...
-     pale_blue, 'FaceAlpha',0.20, 'EdgeColor','none');
+fill([time fliplr(time)], [(mu_acc_A2C+sd_acc_A2C)' fliplr((mu_acc_A2C-sd_acc_A2C)')], pale_red, 'FaceAlpha',0.20, 'EdgeColor','none');
+fill([time fliplr(time)], [(mu_acc_C2A+sd_acc_C2A)' fliplr((mu_acc_C2A-sd_acc_C2A)')], pale_blue, 'FaceAlpha',0.20, 'EdgeColor','none');
 
-errorbar(time, mu_acc_A2C, sem_acc_A2C, 'o-', 'Color', pale_red, ...
-    'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
-errorbar(time, mu_acc_C2A, sem_acc_C2A, 'o-', 'Color', pale_blue, ...
-    'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
+errorbar(time, mu_acc_A2C, sem_acc_A2C, 'o-', 'Color', pale_red, 'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
+errorbar(time, mu_acc_C2A, sem_acc_C2A, 'o-', 'Color', pale_blue, 'LineWidth', 2, 'MarkerSize', 6, 'CapSize', 5);
 
 set(gca, 'FontSize',18, 'TickLabelInterpreter','latex','XColor','k','YColor','k');
 set(gcf, 'Color','w');
@@ -251,9 +222,7 @@ time = ((0:n_steps-1) * dt)/60;
 
 % Shared black-to-red scale: low voltage = black, high voltage = red.
 n_color_levels = 256;
-black_to_red = [linspace(0,1,n_color_levels)', ...
-                zeros(n_color_levels,1), ...
-                zeros(n_color_levels,1)];
+black_to_red = [linspace(0,1,n_color_levels)', zeros(n_color_levels,1), zeros(n_color_levels,1)];
 raw_color_max = max([Dat1(:); Dat2(:)], [], 'omitnan');
 if ~isfinite(raw_color_max) || raw_color_max <= 0
     raw_color_max = 1;
@@ -272,8 +241,7 @@ axis(ax1,[0,10,1,10]);
 clim(ax1,[0 raw_color_max]);
 colormap(ax1,black_to_red);
 cb1 = colorbar(ax1);
-set(cb1,'TickLabelInterpreter','latex','FontSize',Font_Size-2, ...
-         'Ticks',raw_color_ticks,'FontName','Times New Roman');
+set(cb1,'TickLabelInterpreter','latex','FontSize',Font_Size-2, 'Ticks',raw_color_ticks,'FontName','Times New Roman');
 
 % C-to-A
 ax2 = nexttile;
@@ -283,8 +251,7 @@ axis(ax2,[0,10,1,10]);
 clim(ax2,[0 raw_color_max]);
 colormap(ax2,black_to_red);
 cb2 = colorbar(ax2);
-set(cb2,'TickLabelInterpreter','latex','FontSize',Font_Size-2, ...
-         'Ticks',raw_color_ticks,'FontName','Times New Roman');
+set(cb2,'TickLabelInterpreter','latex','FontSize',Font_Size-2, 'Ticks',raw_color_ticks,'FontName','Times New Roman');
 
 % Binary firing outputs obtained by thresholding the circuits output voltage across trials
 Dat1 = TimeSeries_Robot_A2C.NN_firing';
@@ -292,9 +259,7 @@ Dat2 = TimeSeries_Robot_C2A.NN_firing';
 
 % Shared white-to-purple scale: 0 = white, 1 = firing event.
 binary_purple = [0.36 0.18 0.55];
-white_to_purple = [linspace(1,binary_purple(1),n_color_levels)', ...
-                   linspace(1,binary_purple(2),n_color_levels)', ...
-                   linspace(1,binary_purple(3),n_color_levels)'];
+white_to_purple = [linspace(1,binary_purple(1),n_color_levels)', linspace(1,binary_purple(2),n_color_levels)', linspace(1,binary_purple(3),n_color_levels)'];
 
 figure('Position',[680 530 327*2 348],'Color','w');
 t = tiledlayout(2,1,'TileSpacing','compact','Padding','compact');
@@ -309,8 +274,7 @@ axis(ax1,[0,10,1,10]);
 clim(ax1,[0 1]);
 colormap(ax1,white_to_purple);
 cb1 = colorbar(ax1);
-set(cb1,'TickLabelInterpreter','latex','FontSize',Font_Size-2,...
-         'Ticks',[0 1],'FontName','Times New Roman');
+set(cb1,'TickLabelInterpreter','latex','FontSize',Font_Size-2, 'Ticks',[0 1],'FontName','Times New Roman');
 
 % C-to-A
 ax2 = nexttile;
@@ -321,8 +285,7 @@ axis(ax2,[0,10,1,10]);
 clim(ax2,[0 1]);
 colormap(ax2,white_to_purple);
 cb2 = colorbar(ax2);
-set(cb2,'TickLabelInterpreter','latex','FontSize',Font_Size-2,...
-         'Ticks',[0 1],'FontName','Times New Roman');
+set(cb2,'TickLabelInterpreter','latex','FontSize',Font_Size-2, 'Ticks',[0 1],'FontName','Times New Roman');
 
 Dat1 = TimeSeries_Robot_A2C.NN_firing';
 Dat2 = TimeSeries_Robot_C2A.NN_firing';
@@ -705,7 +668,7 @@ figureNames = {
     '17_NetTE_Shuffled_Null_Distributions'
     '18_Frequency_A2C_Pre_ChanceNull'
     '19_Frequency_C2A_Pre_ChanceNull'
-    '20_Frequency_A2C_Post_ChanceNull'close all
+    '20_Frequency_A2C_Post_ChanceNull'
     '21_Frequency_C2A_Post_ChanceNull'
     
     '22_MeanDuration_A2C_Pre_ChanceNull'

@@ -12,7 +12,7 @@ function y = TransEntropy(X, Y, bin, TAU)
     % TAU: Time delay for TE computation
 
     SimulationSteps = length(X);
-
+    disp(SimulationSteps);
     % Initialize probability distribution
     CONT = zeros(bin, bin, bin);
 

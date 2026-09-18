@@ -9,9 +9,9 @@
 function [TimeSeries_Fish, TimeSeries_Robot] = Load_TimeSeries_A_and_C(Parameters,Dat)
 
 x_max = Parameters.x_max;
-y_tank = Parameters.y_tank;
+%y_tank = Parameters.y_tank;
 y_max = Parameters.y_max;
-fps = Parameters.fps;
+%fps = Parameters.fps;
 dt = Parameters.dt;
 Xmin = Parameters.Xmin;
 Xmax = Parameters.Xmax;
@@ -21,8 +21,8 @@ T_total = Parameters.T_total;
 n_trials = Parameters.n_trials;
 scale_x = Parameters.scale_x;
 scale_y = Parameters.scale_y;
-x_rect = Parameters.x_rect;
-y_rect = Parameters.y_rect;
+%x_rect = Parameters.x_rect;
+%y_rect = Parameters.y_rect;
 
 px2cm_x = @(px) (2*(px - Xmin)./(Xmax-Xmin) - 1) * scale_x;
 px2cm_y = @(py) (2*(py - Ymin)./(Ymax-Ymin) - 1) * scale_y;
@@ -52,6 +52,14 @@ NN_filte = nan(T_total,n_trials);
 NN_smoot = nan(T_total,n_trials);
 NN_firing = nan(T_total,n_trials);
 
+
+% Filtering
+order = 4; % Filter order
+fc = 10;   % Desired cutoff frequency in Hz
+Fs = 1/dt;
+wc = fc / (Fs/2); % Normalize to Nyquist
+[b, a] = butter(order, wc, 'low');
+
 for i = 1:n_trials
     if i>length(Dat), continue; end
     Xf_px = Dat(i).Xf;
@@ -69,15 +77,9 @@ for i = 1:n_trials
     N_filte = Dat(i).Filtered(1:n);
     N_smoot = Dat(i).Smoothed(1:n);
     N_firing = Dat(i).BinarySig(1:n);
-
-    % Filtering
-    order = 4; % Filter order
-    fc = 10;   % Desired cutoff frequency in Hz
-    Fs = 1/dt;
-    wc = fc / (Fs/2); % Normalize to Nyquist
     
-    [Xfilter,Yfilter,Vf,Wf,Af,Headingf,Vxf,Vyf] = Kinematic_Variables(Xf,Yf,dt,x_max/2,y_max/2,order,wc);
-    [Xr_filter,Yr_filter,Vr,Wr,Ar,Headingr,Vxr,Vyr] = Kinematic_Variables(Xr,Yr,dt,x_max/2,y_max/2,order,wc);
+    [Xfilter,Yfilter,Vf,Wf,Af,Headingf,Vxf,Vyf] = Kinematic_Variables(Xf,Yf,dt,x_max/2,y_max/2, b, a);
+    [Xr_filter,Yr_filter,Vr,Wr,Ar,Headingr,Vxr,Vyr] = Kinematic_Variables(Xr,Yr,dt,x_max/2,y_max/2, b, a);
 
     % save time series Fish
     XX_f(1:length(Yfilter),i) =  Xfilter;
