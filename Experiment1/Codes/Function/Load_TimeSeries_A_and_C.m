@@ -46,9 +46,9 @@ AA_r = nan(T_total,n_trials);
 VVx_r = nan(T_total,n_trials);
 VVy_r = nan(T_total,n_trials);
 HH_r = nan(T_total,n_trials);
-
+ 
 NN_raw = nan(T_total,n_trials);
-NN_filte = nan(T_total,n_trials);
+NN_filter = nan(T_total,n_trials);
 NN_smoot = nan(T_total,n_trials);
 NN_firing = nan(T_total,n_trials);
 
@@ -74,7 +74,7 @@ for i = 1:n_trials
     Xr = px2cm_x(Xr_px(1:n));
     Yr = px2cm_y(Yr_px(1:n));
     N_unfil = Dat(i).Unfiltered(1:n);
-    N_filte = Dat(i).Filtered(1:n);
+    N_filter = Dat(i).Filtered(1:n);
     N_smoot = Dat(i).Smoothed(1:n);
     N_firing = Dat(i).BinarySig(1:n);
     
@@ -90,15 +90,6 @@ for i = 1:n_trials
     VVx_f(1:length(Vxf),i) =  Vxf;
     VVy_f(1:length(Vyf),i) =  Vyf;
     HH_f(1:length(Yfilter),i) =  Headingf;
-   
-    TimeSeries_Fish.XX_f = XX_f;
-    TimeSeries_Fish.YY_f = YY_f;
-    TimeSeries_Fish.VV_f = VV_f;
-    TimeSeries_Fish.WW_f = WW_f;
-    TimeSeries_Fish.AA_f = AA_f;
-    TimeSeries_Fish.VVx_f = VVx_f;
-    TimeSeries_Fish.VVy_f = VVy_f;
-    TimeSeries_Fish.HH_f = HH_f;
 
     % save time series Robot
     XX_r(1:length(Xr_filter),i) =  Xr_filter;
@@ -111,22 +102,31 @@ for i = 1:n_trials
     HH_r(1:length(Vyr),i) =  Headingr;
 
     NN_raw(1:length(N_unfil),i) = N_unfil;
-    NN_filte(1:length(N_filte),i) = N_filte;
+    NN_filter(1:length(N_filter),i) = N_filter;
     NN_smoot(1:length(N_smoot),i) = N_smoot;
     NN_firing(1:length(N_firing),i) = N_firing;
-
-    TimeSeries_Robot.XX_r = XX_r;
-    TimeSeries_Robot.YY_r = YY_r;
-    TimeSeries_Robot.VV_r = VV_r;
-    TimeSeries_Robot.WW_r = WW_r;
-    TimeSeries_Robot.AA_r = AA_r;
-    TimeSeries_Robot.VVx_r = VVx_r;
-    TimeSeries_Robot.VVy_r = VVy_r;
-    TimeSeries_Robot.HH_r = HH_r;
-    TimeSeries_Robot.NN_raw = NN_raw;
-    TimeSeries_Robot.NN_filte = NN_filte;
-    TimeSeries_Robot.NN_smoot = NN_smoot;
-    TimeSeries_Robot.NN_firing = NN_firing;
 end
+
+TimeSeries_Fish.XX_f = XX_f;
+TimeSeries_Fish.YY_f = YY_f;
+TimeSeries_Fish.VV_f = VV_f;
+TimeSeries_Fish.WW_f = WW_f;
+TimeSeries_Fish.AA_f = AA_f;
+TimeSeries_Fish.VVx_f = VVx_f;
+TimeSeries_Fish.VVy_f = VVy_f;
+TimeSeries_Fish.HH_f = HH_f;
+
+TimeSeries_Robot.XX_r = XX_r;
+TimeSeries_Robot.YY_r = YY_r;
+TimeSeries_Robot.VV_r = VV_r;
+TimeSeries_Robot.WW_r = WW_r;
+TimeSeries_Robot.AA_r = AA_r;
+TimeSeries_Robot.VVx_r = VVx_r;
+TimeSeries_Robot.VVy_r = VVy_r;
+TimeSeries_Robot.HH_r = HH_r;
+TimeSeries_Robot.NN_raw = NN_raw;
+TimeSeries_Robot.NN_filter = NN_filter;
+TimeSeries_Robot.NN_smoot = NN_smoot;
+TimeSeries_Robot.NN_firing = NN_firing;
 
 end

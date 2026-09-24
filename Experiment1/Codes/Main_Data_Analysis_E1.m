@@ -11,6 +11,9 @@ clearvars;
 clc;
 close all;
 
+% TEMPORARY SETTING TO DISABLE FIGURES
+set(0, 'DefaultFigureVisible', 'off');
+
 % true  = load the saved Results MAT file and only recreate figures
 % false = run the complete analysis and update the MAT
 useCachedResults = false;
@@ -29,6 +32,8 @@ end
 resultsFile = fullfile(outputFolder, 'Result_E1.mat');
 
 cacheFile = resultsFile;
+
+
 if useCachedResults
 
     assert(isfile(cacheFile), 'Cannot find cached result file:\n%s', cacheFile);
@@ -53,7 +58,7 @@ else
     
     %% 2) Load Parameters
     Parameters = load_constants(Dat_Control);
-
+    
     x_max = Parameters.x_max;
     y_tank = Parameters.y_tank;
     y_max = Parameters.y_max;
@@ -71,7 +76,6 @@ else
     [TimeSeries_Fish_A2C, TimeSeries_Robot_A2C] = Load_TimeSeries_A_and_C(Parameters, Dat_A2C);
 
     [TimeSeries_Fish_C2A, TimeSeries_Robot_C2A] = Load_TimeSeries_A_and_C(Parameters, Dat_C2A);
-    
 end
 
 set(groot, 'DefaultFigureWindowStyle', 'normal');

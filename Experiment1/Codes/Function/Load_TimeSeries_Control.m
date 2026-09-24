@@ -29,6 +29,7 @@ px2cm_y = @(py) (2*(py - Ymin)./(Ymax-Ymin) - 1) * scale_y;
 
 
 % Control Trials
+XX_control = nan(T_total, n_trials);
 YY_control = nan(T_total,n_trials);
 VV_control = nan(T_total,n_trials);
 WW_control = nan(T_total,n_trials);
@@ -57,7 +58,7 @@ for i = 1:n_trials
     X_cm = px2cm_x(X_px(1:n));
     Y_cm = px2cm_y(Y_px(1:n));
     
-    [Xfilter, Yfilter, V, W, A, heading, Vx, Vy] = Kinematic_Variables(X_cm,Y_cm,dt,x_max/2,y_max/2, b, a);
+    [Xfilter, Yfilter, V, W, A, ~, Vx, Vy] = Kinematic_Variables(X_cm,Y_cm,dt,x_max/2,y_max/2, b, a);
       
     % save time series
     XX_control(1:length(Yfilter),i) =  Xfilter;

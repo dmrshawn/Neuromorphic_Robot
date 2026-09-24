@@ -14,8 +14,7 @@ accel_thresh = 1000; % cm/s²
 
 vx_raw = gradient(Xi, dt);
 vy_raw = gradient(Yi, dt);
-% V_raw = sqrt(vx_raw.^2 + vy_raw.^2);
-V_raw = hypot(vx_raw, vy_raw); 
+V_raw = sqrt(vx_raw.^2 + vy_raw.^2);
 A_raw = gradient(V_raw, dt); % Acceleration magnitude (scalar)
 
 % outlier_speed = V_raw > speed_thresh;
@@ -46,7 +45,7 @@ Yfilter = max(min(Yfilter, Ymax), -Ymax);
 Vx = gradient(Xfilter,dt);
 Vy = gradient(Yfilter,dt);
 % V = sqrt(Vx.^2 + Vy.^2);
-V = hypot(Vx, Vy);
+V = 
 
 A = gradient(V,dt);
 
